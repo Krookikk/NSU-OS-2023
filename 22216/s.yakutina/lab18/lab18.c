@@ -81,6 +81,7 @@ int main(int argc, char* argv[])
                 perror("readlink");
             }
         }
+        printf("\n");
 
     }
     exit(0);

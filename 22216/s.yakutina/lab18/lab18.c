@@ -6,6 +6,8 @@
 #include <pwd.h>
 #include <grp.h>
 #include <libgen.h>
+#include <unistd.h>  
+#include <limits.h>
 
 int main(int argc, char* argv[])
 {
@@ -30,13 +32,13 @@ int main(int argc, char* argv[])
             "?");
         printf((mode & S_IRUSR) ? "r" : "-");
         printf((mode & S_IWUSR) ? "w" : "-");
-        printf((mode & S_IXUSR) ? "x" : "-");
+        printf((mode & S_ISUID) ? ((mode & S_IXUSR) ? "s" : "S") : ((mode & S_IXUSR) ? "x" : "-"));
         printf((mode & S_IRGRP) ? "r" : "-");
         printf((mode & S_IWGRP) ? "w" : "-");
-        printf((mode & S_IXGRP) ? "x" : "-");
+        printf((mode & S_ISGID) ? ((mode & S_IXGRP) ? "s" : "S") : ((mode & S_IXGRP) ? "x" : "-"));
         printf((mode & S_IROTH) ? "r" : "-");
         printf((mode & S_IWOTH) ? "w" : "-");
-        printf((mode & S_IXOTH) ? "x" : "-");
+        printf((mode & S_ISVTX) ? ((mode & S_IXOTH) ? "t" : "T") : ((mode & S_IXOTH) ? "x" : "-"));
 
         printf("  %-5u", file_info.st_nlink);
 
@@ -56,9 +58,9 @@ int main(int argc, char* argv[])
         else {
             printf("  %-10u", file_info.st_gid);
         }
+        
 
-
-        if (S_ISREG(mode)) {
+        if (S_ISREG(mode)) { 
             printf("  %-10lld", (long long int)file_info.st_size);
         }
         else {
@@ -69,8 +71,17 @@ int main(int argc, char* argv[])
 
         printf("  %s\n", basename(filename));
 
+        if (S_ISLNK(mode)) {
+            char link_target[PATH_MAX];
+            ssize_t link_len = readlink(filename, link_target, PATH_MAX);
+            if (link_len != -1) {
+                link_target[link_len] = '\0'; 
+                printf(" -> %s", link_target);
+            } else {
+                perror("readlink");
+            }
+        }
+
     }
-
-
     exit(0);
 }

@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
+#include <sys/wait.h>
 
 int main() {
     int fd[2]; 
@@ -34,6 +35,7 @@ int main() {
 
         if (count_p == -1) {
             perror("read");
+            close(fd[0]); 
             exit(1);
         }
 
@@ -48,16 +50,23 @@ int main() {
         while ((count_s = read(STDIN_FILENO, buffer_s, BUFSIZ)) > 0) {
             if (write(fd[1], buffer_s, count_s) == -1) {
                 perror("write");
+                close(fd[1]);
                 exit(1);
             }
         }
 
         if (count_s == -1) {
             perror("read");
+            close(fd[1]);
             exit(1);
         }
 
         close(fd[1]);
+
+        if (wait(NULL) == -1) {
+            perror("wait");
+            exit(1);
+        }
     }
 
     return 0;

@@ -38,6 +38,7 @@ int main() {
         }
 
         close(fd[0]);  
+        exit(0);
     } 
 
     else { 

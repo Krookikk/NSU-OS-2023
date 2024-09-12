@@ -27,8 +27,8 @@ int main() {
         ssize_t count_p; 
 
         while ((count_p = read(fd[0], buffer_p, BUFSIZ)) > 0) { 
-            for (int i = 0; i < count_p; i++) {         
-                printf("%c", toupper(buffer_p[i]));
+            for (int i = 0; i < count_p; i++) {  
+                putchar(toupper(buffer_p[i]));       
             }
         }
 

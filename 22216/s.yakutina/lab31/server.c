@@ -73,6 +73,11 @@ int main() {
                 if (poll_fds[i].fd == -1) {
                     poll_fds[i].fd = client_fd;
                     poll_fds[i].events = POLLIN;
+
+                    if (i == MAX_CLIENTS) {
+                        poll_fds[0].events = 0;
+                    }
+
                     break;
                 }
             }
@@ -89,8 +94,13 @@ int main() {
                         printf("%c", buffer[j]);
                     }
                 } else {
-                    close(poll_fds[i].fd);
+                    if (bytes_read < 0) {
+                        perror("read");
+                    }
+
+                    close(poll_fds[i].fd); 
                     poll_fds[i].fd = -1;
+                    poll_fds[0].events = POLLIN;
                 } 
             }
         }

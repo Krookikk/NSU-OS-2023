@@ -18,7 +18,7 @@ void sigcatch(int sig) {
 
 int main() {
     char *sock_path = "./socket";
-    int server_fd, client_fd, max_fd;
+    int server_fd, client_fd;
     struct sockaddr_un server_addr;
     struct pollfd poll_fds[MAX_CLIENTS + 1];
     char buffer[BUFFER_SIZE];

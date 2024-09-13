@@ -6,7 +6,8 @@
 #include <pwd.h>
 #include <grp.h>
 #include <libgen.h>
-#include <unistd.h>  
+#include <unistd.h>
+#include <errno.h>  
 
 #define MAX_PATH_LEN 2048
 

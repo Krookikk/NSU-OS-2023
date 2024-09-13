@@ -7,10 +7,17 @@
 #include <grp.h>
 #include <libgen.h>
 #include <unistd.h>  
-#include <limits.h>
+
+#define MAX_PATH_LEN 2048
 
 int main(int argc, char* argv[])
 {
+
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <file or directory> [file or directory ...]\n", argv[0]);
+        exit(1);
+
+    }
 
     for (int i = 1; i < argc; i++) {
         char* filename = argv[i];
@@ -72,14 +79,32 @@ int main(int argc, char* argv[])
         printf("  %s\n", basename(filename));
 
         if (S_ISLNK(mode)) {
-            char link_target[PATH_MAX];
-            ssize_t link_len = readlink(filename, link_target, PATH_MAX);
+            long max_len = pathconf(filename, _PC_SYMLINK_MAX);
+            if (max_len == -1) {
+                if (errno == 0) {
+                    max_len = MAX_PATH_LEN; 
+                } else {
+                    perror("pathconf");
+                    continue;
+                }   
+            }
+
+
+            if (max_len > MAX_PATH_LEN) {
+                max_len = MAX_PATH_LEN; 
+            }
+
+            char link_target[max_len + 1];
+
+            ssize_t link_len = readlink(filename, link_target, max_len);
             if (link_len != -1) {
-                link_target[link_len] = '\0'; 
+                link_target[link_len] = '\0';
                 printf(" -> %s", link_target);
             } else {
-                perror("readlink");
+                perror("readlink"); 
+                continue;
             }
+
         }
         printf("\n");
 

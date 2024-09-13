@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 
         printf("  %.24s", ctime(&file_info.st_mtime));
 
-        printf("  %s\n", basename(filename));
+        printf("  %s", basename(filename));
 
         if (S_ISLNK(mode)) {
             long max_len = pathconf(filename, _PC_SYMLINK_MAX);

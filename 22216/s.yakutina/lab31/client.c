@@ -23,19 +23,16 @@ int main() {
     strncpy(server_addr.sun_path, sock_path, sizeof(server_addr.sun_path) - 1);
 
     if (connect(client_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
-        close(client_fd);
         perror("connect");
         exit(1);
     }
 
     while ((bytes_read = read(0, buffer, BUFFER_SIZE)) > 0) {
         if (write(client_fd, buffer, bytes_read) == -1) {
-            close(client_fd);
             perror("write");
             exit(1);
         }
     }
 
-    close(client_fd);
     return 0;
 }

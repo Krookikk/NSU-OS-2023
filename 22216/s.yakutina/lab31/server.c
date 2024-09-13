@@ -30,7 +30,7 @@ int main() {
 
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sun_family = AF_UNIX;
-    strncpy(server_addr.sun_path, sock_path, sizeof(server_addr.sun_path) - 1);
+    strcpy(server_addr.sun_path, sock_path);
 
     if (bind(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
         perror("bind");
@@ -85,13 +85,16 @@ int main() {
 
         for (int i = 1; i <= MAX_CLIENTS; i++) {
             if (poll_fds[i].revents & POLLIN) {
-                memset(buffer, 0, BUFFER_SIZE);
                 int bytes_read = read(poll_fds[i].fd, buffer, BUFFER_SIZE);
 
                 if (bytes_read > 0) {
                     for (int j = 0; j < bytes_read; j++) {
                         buffer[j] = toupper(buffer[j]);
-                        printf("%c", buffer[j]);
+                    }
+
+                    if (write(1, buffer, bytes_read) == -1) {
+                        perror("write");
+                        exit(1);
                     }
                 } else {
                     if (bytes_read < 0) {
